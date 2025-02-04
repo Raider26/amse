@@ -4,7 +4,7 @@ class GameItem {
   String title;
   String platform;
   String shortDescription;
-  Image image;
+  String image;
   bool liked;
 
   GameItem({
@@ -20,19 +20,17 @@ class GameItem {
 final List<GameItem> games = [
   GameItem(
     title: "The Legend of Zelda",
-    platform: "Switch",
+    platform: "Nintendo Switch",
     shortDescription: "Un jeu d'aventure épique.",
-    image: Image.network(
-        "https://upload.wikimedia.org/wikipedia/en/a/a7/Legend_of_Zelda_cover_%28NES%29.jpg"),
+    image: "assets/images/BOTW.png",
   ),
   GameItem(
     title: "God of War",
     platform: "PlayStation",
     shortDescription: "Kratos part en quête dans la mythologie nordique.",
-    image: Image.network(
-        "https://upload.wikimedia.org/wikipedia/en/a/a7/God_of_War_4_cover.jpg"),
+    image: "assets/images/GoW.webp",
   ),
-  GameItem(
+  /*GameItem(
     title: "Halo Infinite",
     platform: "Xbox",
     shortDescription: "Un FPS légendaire revient en force.",
@@ -45,12 +43,11 @@ final List<GameItem> games = [
     shortDescription: "L'aventure continue avec Peter Parker et Miles Morales.",
     image: Image.network(
         "https://upload.wikimedia.org/wikipedia/en/4/40/Spider-Man_2_PS5_cover.jpg"),
-  ),
+  ),*/
   GameItem(
     title: "Forza Horizon 5",
     platform: "Xbox",
     shortDescription: "La course en monde ouvert au Mexique.",
-    image: Image.network(
-        "https://upload.wikimedia.org/wikipedia/en/f/fc/Forza_Horizon_5_cover_art.jpg"),
+    image: "assets/images/forza.jpg",
   ),
 ];

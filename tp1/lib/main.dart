@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Navigation avec Onglets',
+      title: 'TP1',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -47,15 +47,17 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
-    const HomePage(),
-    const FavoritesPage(),
-    const SettingsPage(),
-  ];
+  final List<GameItem> _games = games;
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+    });
+  }
+
+  void toggleFavorite(GameItem game) {
+    setState(() {
+      game.liked = !game.liked;
     });
   }
 
@@ -64,7 +66,11 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
-        children: _pages,
+        children: [
+          HomePage(games: _games, onToggleFavorite: toggleFavorite),
+          FavoritesPage(games: _games),
+          const SettingsPage(),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
@@ -89,36 +95,28 @@ class _MainScreenState extends State<MainScreen> {
 }
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  final List<GameItem> games;
+  final Function(GameItem) onToggleFavorite;
+
+  const HomePage(
+      {super.key, required this.games, required this.onToggleFavorite});
 
   @override
   Widget build(BuildContext context) {
     final gamesByPlatform = getGamesByPlatform();
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Liste des Jeux")),
+      appBar: AppBar(
+        title: const Text("Liste des Jeux"),
+        centerTitle: true,
+        titleTextStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+      ),
       body: ListView(
         children: gamesByPlatform.entries.map((entry) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(10),
-                margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                decoration: BoxDecoration(
-                  color: _getPlatformColor(entry.key),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  entry.key,
-                  style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                  textAlign: TextAlign.center,
-                ),
-              ),
+              buildPlatformTitle(entry.key),
               Column(
                 children: entry.value
                     .map((game) => _buildGameCard(game, context))
@@ -131,14 +129,59 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  Widget buildPlatformTitle(String platform) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      decoration: BoxDecoration(
+        color: _getPlatformColor(platform),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            _getPlatformIcon(platform),
+            width: 30,
+            height: 30,
+            fit: BoxFit.contain,
+          ),
+          const SizedBox(width: 10),
+          Text(
+            platform,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getPlatformIcon(String platform) {
+    switch (platform) {
+      case "PlayStation":
+        return "assets/images/playstation.png";
+      case "Xbox":
+        return "assets/images/xbox.png";
+      case "Nintendo Switch":
+        return "assets/images/switch.png";
+      default:
+        return "assets/images/default.png";
+    }
+  }
+
   Color _getPlatformColor(String platform) {
     switch (platform) {
       case "PlayStation":
-        return Colors.blue.shade700;
+        return Color(0xFF003791);
       case "Xbox":
-        return Colors.green.shade700;
+        return Color(0xFF379137);
       case "Nintendo Switch":
-        return Colors.red.shade700;
+        return Color(0xFFE60012);
       default:
         return Colors.grey;
     }
@@ -161,14 +204,23 @@ class HomePage extends StatelessWidget {
           contentPadding: const EdgeInsets.all(8),
           leading: ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: SizedBox(width: 50, height: 50, child: game.image),
+            child: Image.asset(
+              game.image,
+              width: 50,
+              height: 50,
+            ),
           ),
           title: Text(game.title,
               style: const TextStyle(fontWeight: FontWeight.bold)),
           subtitle: Text(game.shortDescription),
-          trailing: Icon(
-            game.liked ? Icons.favorite : Icons.favorite_border,
-            color: game.liked ? Colors.red : null,
+          trailing: IconButton(
+            icon: Icon(
+              game.liked ? Icons.favorite : Icons.favorite_border,
+              color: game.liked ? Colors.red : null,
+            ),
+            onPressed: () {
+              onToggleFavorite(game);
+            },
           ),
         ),
       ),
@@ -177,7 +229,9 @@ class HomePage extends StatelessWidget {
 }
 
 class FavoritesPage extends StatelessWidget {
-  const FavoritesPage({super.key});
+  final List<GameItem> games;
+
+  const FavoritesPage({super.key, required this.games});
 
   @override
   Widget build(BuildContext context) {
@@ -191,17 +245,30 @@ class FavoritesPage extends StatelessWidget {
               itemCount: favoriteGames.length,
               itemBuilder: (context, index) {
                 final game = favoriteGames[index];
-                return ListTile(
-                  leading: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: SizedBox(
-                      width: 50,
-                      height: 50,
-                      child: game.image,
+                return Card(
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GameDetailPage(game: game),
+                        ),
+                      );
+                    },
+                    child: ListTile(
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.asset(game.image, width: 50, height: 50),
+                      ),
+                      title: Text(game.title,
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(game.platform),
                     ),
                   ),
-                  title: Text(game.title),
-                  subtitle: Text(game.platform),
                 );
               },
             ),
