@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'data.dart';
 
 class GameDetailPage extends StatelessWidget {
@@ -34,9 +35,26 @@ class GameDetailPage extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Plateforme: ${game.platform}",
+                    style: const TextStyle(fontSize: 18, color: Colors.black),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(width: 8),
+                  Image.asset(
+                    _getPlatformIcon(game.platform),
+                    width: 30,
+                    height: 30,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
               Text(
-                game.platform,
-                style: const TextStyle(fontSize: 18, color: Colors.grey),
+                "Date de sortie: ${DateFormat('dd/MM/yyyy').format(game.date)}",
+                style: const TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
@@ -57,5 +75,18 @@ class GameDetailPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getPlatformIcon(String platform) {
+    switch (platform) {
+      case "PlayStation":
+        return "assets/images/playstation-black.webp";
+      case "Xbox":
+        return "assets/images/xbox-black.png";
+      case "Nintendo Switch":
+        return "assets/images/switch-black.png";
+      default:
+        return "assets/images/default.png";
+    }
   }
 }

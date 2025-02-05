@@ -14,6 +14,10 @@ Map<String, List<GameItem>> getGamesByPlatform() {
     categorizedGames[game.platform]?.add(game);
   }
 
+  for (var entry in categorizedGames.entries) {
+    entry.value.sort((a, b) => a.title.compareTo(b.title));
+  }
+
   return categorizedGames;
 }
 
@@ -45,15 +49,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
-
-  final List<GameItem> _games = games;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+  final ScrollController _scrollController = ScrollController();
 
   void toggleFavorite(GameItem game) {
     setState(() {
@@ -61,45 +57,25 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: [
-          HomePage(games: _games, onToggleFavorite: toggleFavorite),
-          FavoritesPage(games: _games),
-          const SettingsPage(),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Accueil',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favoris',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Paramètres',
-          ),
-        ],
-      ),
+  void scrollToPlatform(String platform) {
+    double offset = 0;
+    switch (platform) {
+      case "PlayStation":
+        offset = 70;
+        break;
+      case "Xbox":
+        offset = 2440;
+        break;
+      case "Nintendo Switch":
+        offset = 5000;
+        break;
+    }
+    _scrollController.animateTo(
+      offset,
+      duration: const Duration(seconds: 1),
+      curve: Curves.easeInOut,
     );
   }
-}
-
-class HomePage extends StatelessWidget {
-  final List<GameItem> games;
-  final Function(GameItem) onToggleFavorite;
-
-  const HomePage(
-      {super.key, required this.games, required this.onToggleFavorite});
 
   @override
   Widget build(BuildContext context) {
@@ -111,20 +87,64 @@ class HomePage extends StatelessWidget {
         centerTitle: true,
         titleTextStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
       ),
-      body: ListView(
-        children: gamesByPlatform.entries.map((entry) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              buildPlatformTitle(entry.key),
-              Column(
-                children: entry.value
-                    .map((game) => _buildGameCard(game, context))
-                    .toList(),
-              ),
-            ],
-          );
-        }).toList(),
+      body: SingleChildScrollView(
+        controller: _scrollController,
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () => scrollToPlatform("PlayStation"),
+                  style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(160, 60),
+                      backgroundColor: Color(0xFF003791),
+                      foregroundColor: Colors.white,
+                      textStyle:
+                          const TextStyle(fontSize: 20, color: Colors.white)),
+                  child: const Text("PlayStation"),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () => scrollToPlatform("Xbox"),
+                  style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(160, 60),
+                      backgroundColor: Color(0xFF379137),
+                      foregroundColor: Colors.white,
+                      textStyle: const TextStyle(fontSize: 20)),
+                  child: const Text("Xbox"),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () => scrollToPlatform("Nintendo Switch"),
+                  style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(160, 60),
+                      backgroundColor: Color(0xFFE60012),
+                      foregroundColor: Colors.white,
+                      textStyle:
+                          const TextStyle(fontSize: 20, color: Colors.white)),
+                  child: const Text("Switch"),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Column(
+              children: gamesByPlatform.entries.map((entry) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    buildPlatformTitle(entry.key),
+                    Column(
+                      children: entry.value
+                          .map((game) => _buildGameCard(game, context))
+                          .toList(),
+                    ),
+                  ],
+                );
+              }).toList(),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -200,27 +220,54 @@ class HomePage extends StatelessWidget {
             ),
           );
         },
-        child: ListTile(
-          contentPadding: const EdgeInsets.all(8),
-          leading: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.asset(
-              game.image,
-              width: 50,
-              height: 50,
-            ),
-          ),
-          title: Text(game.title,
-              style: const TextStyle(fontWeight: FontWeight.bold)),
-          subtitle: Text(game.shortDescription),
-          trailing: IconButton(
-            icon: Icon(
-              game.liked ? Icons.favorite : Icons.favorite_border,
-              color: game.liked ? Colors.red : null,
-            ),
-            onPressed: () {
-              onToggleFavorite(game);
-            },
+        child: Container(
+          height: 150,
+          padding: const EdgeInsets.all(8),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: SizedBox(
+                  width: 100,
+                  height: double.infinity,
+                  child: Image.asset(
+                    game.image,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      game.title,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 18),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      game.shortDescription,
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: Icon(
+                  game.liked ? Icons.favorite : Icons.favorite_border,
+                  color: game.liked ? Colors.red : null,
+                ),
+                onPressed: () {
+                  toggleFavorite(game);
+                },
+              ),
+            ],
           ),
         ),
       ),
@@ -235,7 +282,8 @@ class FavoritesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final favoriteGames = games.where((game) => game.liked).toList();
+    final favoriteGames = games.where((game) => game.liked).toList()
+      ..sort((a, b) => a.title.compareTo(b.title));
 
     return Scaffold(
       appBar: AppBar(title: const Text("Favoris")),
@@ -259,14 +307,47 @@ class FavoritesPage extends StatelessWidget {
                         ),
                       );
                     },
-                    child: ListTile(
-                      leading: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.asset(game.image, width: 50, height: 50),
+                    child: Container(
+                      height: 120,
+                      padding: const EdgeInsets.all(8),
+                      child: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: SizedBox(
+                              width: 100,
+                              height: double.infinity,
+                              child: Image.asset(
+                                game.image,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  game.title,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  game.platform,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      title: Text(game.title,
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text(game.platform),
                     ),
                   ),
                 );
