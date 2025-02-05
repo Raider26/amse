@@ -1,25 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'data.dart';
 import 'gamedetailpage.dart';
-
-Map<String, List<GameItem>> getGamesByPlatform() {
-  Map<String, List<GameItem>> categorizedGames = {
-    "PlayStation": [],
-    "Xbox": [],
-    "Nintendo Switch": [],
-  };
-
-  for (var game in games) {
-    categorizedGames[game.platform]?.add(game);
-  }
-
-  for (var entry in categorizedGames.entries) {
-    entry.value.sort((a, b) => a.title.compareTo(b.title));
-  }
-
-  return categorizedGames;
-}
 
 void main() {
   runApp(const MyApp());
@@ -49,25 +30,28 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  int _selectedIndex = 0;
+  final PageController _pageController = PageController();
   final ScrollController _scrollController = ScrollController();
 
-  void toggleFavorite(GameItem game) {
+  void _onItemTapped(int index) {
     setState(() {
-      game.liked = !game.liked;
+      _selectedIndex = index;
     });
+    _pageController.jumpToPage(index);
   }
 
   void scrollToPlatform(String platform) {
     double offset = 0;
     switch (platform) {
       case "PlayStation":
-        offset = 70;
+        offset = 0;
         break;
       case "Xbox":
-        offset = 2440;
+        offset = 1560;
         break;
       case "Nintendo Switch":
-        offset = 5000;
+        offset = 3235;
         break;
     }
     _scrollController.animateTo(
@@ -77,140 +61,177 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+  void toggleFavorite(GameItem game) {
+    setState(() {
+      game.liked = !game.liked;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final gamesByPlatform = getGamesByPlatform();
+    final List<Widget> _pages = [
+      HomePage(
+          games: games,
+          onGameLiked: toggleFavorite,
+          scrollController: _scrollController),
+      FavoritesPage(games: games, onGameLiked: toggleFavorite),
+      const AboutPage(),
+    ];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Liste des Jeux"),
+        title: Text(
+          ["Liste des Jeux", "Jeux Favoris", "À propos"][_selectedIndex],
+        ),
         centerTitle: true,
-        titleTextStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+        titleTextStyle:
+            const TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
       ),
-      body: SingleChildScrollView(
-        controller: _scrollController,
-        child: Column(
-          children: [
+      body: Column(
+        children: [
+          if (_selectedIndex == 0) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
                   onPressed: () => scrollToPlatform("PlayStation"),
                   style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(160, 60),
-                      backgroundColor: Color(0xFF003791),
-                      foregroundColor: Colors.white,
-                      textStyle:
-                          const TextStyle(fontSize: 20, color: Colors.white)),
+                    minimumSize: const Size(160, 60),
+                    backgroundColor: const Color(0xFF003791),
+                    foregroundColor: Colors.white,
+                    textStyle: const TextStyle(fontSize: 20),
+                  ),
                   child: const Text("PlayStation"),
                 ),
                 const SizedBox(width: 10),
                 ElevatedButton(
                   onPressed: () => scrollToPlatform("Xbox"),
                   style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(160, 60),
-                      backgroundColor: Color(0xFF379137),
-                      foregroundColor: Colors.white,
-                      textStyle: const TextStyle(fontSize: 20)),
+                    minimumSize: const Size(160, 60),
+                    backgroundColor: const Color(0xFF379137),
+                    foregroundColor: Colors.white,
+                    textStyle: const TextStyle(fontSize: 20),
+                  ),
                   child: const Text("Xbox"),
                 ),
                 const SizedBox(width: 10),
                 ElevatedButton(
                   onPressed: () => scrollToPlatform("Nintendo Switch"),
                   style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(160, 60),
-                      backgroundColor: Color(0xFFE60012),
-                      foregroundColor: Colors.white,
-                      textStyle:
-                          const TextStyle(fontSize: 20, color: Colors.white)),
+                    minimumSize: const Size(160, 60),
+                    backgroundColor: const Color(0xFFE60012),
+                    foregroundColor: Colors.white,
+                    textStyle: const TextStyle(fontSize: 20),
+                  ),
                   child: const Text("Switch"),
                 ),
               ],
             ),
             const SizedBox(height: 20),
-            Column(
-              children: gamesByPlatform.entries.map((entry) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    buildPlatformTitle(entry.key),
-                    Column(
-                      children: entry.value
-                          .map((game) => _buildGameCard(game, context))
-                          .toList(),
-                    ),
-                  ],
-                );
-              }).toList(),
-            ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildPlatformTitle(String platform) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(10),
-      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-      decoration: BoxDecoration(
-        color: _getPlatformColor(platform),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            _getPlatformIcon(platform),
-            width: 30,
-            height: 30,
-            fit: BoxFit.contain,
-          ),
-          const SizedBox(width: 10),
-          Text(
-            platform,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+          Expanded(
+            child: PageView(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _selectedIndex = index;
+                });
+              },
+              children: _pages,
             ),
           ),
         ],
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.gamepad), label: 'Jeux'),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Favoris'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.info_outline), label: 'À propos'),
+        ],
+      ),
     );
   }
+}
 
-  String _getPlatformIcon(String platform) {
-    switch (platform) {
-      case "PlayStation":
-        return "assets/images/playstation.png";
-      case "Xbox":
-        return "assets/images/xbox.png";
-      case "Nintendo Switch":
-        return "assets/images/switch.png";
-      default:
-        return "assets/images/default.png";
-    }
-  }
+class HomePage extends StatelessWidget {
+  final List<GameItem> games;
+  final Function(GameItem) onGameLiked;
+  final ScrollController scrollController;
 
-  Color _getPlatformColor(String platform) {
-    switch (platform) {
-      case "PlayStation":
-        return Color(0xFF003791);
-      case "Xbox":
-        return Color(0xFF379137);
-      case "Nintendo Switch":
-        return Color(0xFFE60012);
-      default:
-        return Colors.grey;
-    }
+  final Map<String, Map<String, dynamic>> categoryProperties = {
+    "PlayStation": {
+      "color": Color(0xFF003791),
+      "image": 'assets/images/playstation.png',
+    },
+    "Xbox": {
+      "color": Color(0xFF379137),
+      "image": 'assets/images/xbox.png',
+    },
+    "Nintendo Switch": {
+      "color": Color(0xFFE60012),
+      "image": 'assets/images/switch.png',
+    },
+  };
+
+  HomePage(
+      {super.key,
+      required this.games,
+      required this.onGameLiked,
+      required this.scrollController});
+
+  @override
+  Widget build(BuildContext context) {
+    final gamesByPlatform = getGamesByPlatform();
+
+    return SingleChildScrollView(
+      controller: scrollController,
+      child: Column(
+        children: gamesByPlatform.entries.map((entry) {
+          final categoryInfo = categoryProperties[entry.key];
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                color: categoryInfo?['color'],
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      categoryInfo?['image'],
+                      width: 30,
+                      height: 30,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      entry.key,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                children: entry.value
+                    .map((game) => _buildGameCard(game, context))
+                    .toList(),
+              ),
+            ],
+          );
+        }).toList(),
+      ),
+    );
   }
 
   Widget _buildGameCard(GameItem game, BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: InkWell(
         onTap: () {
           Navigator.push(
@@ -221,51 +242,47 @@ class _MainScreenState extends State<MainScreen> {
           );
         },
         child: Container(
-          height: 150,
-          padding: const EdgeInsets.all(8),
+          height: 100,
+          padding: EdgeInsets.zero,
           child: Row(
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: SizedBox(
+              SizedBox(
+                height: 100,
+                width: 100,
+                child: Image.asset(
+                  game.image,
                   width: 100,
-                  height: double.infinity,
-                  child: Image.asset(
-                    game.image,
-                    fit: BoxFit.contain,
-                  ),
+                  height: 100,
+                  fit: BoxFit.cover,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      game.title,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 18),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      game.shortDescription,
-                      maxLines: 4,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        game.title,
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      Text(
+                        game.shortDescription,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               IconButton(
                 icon: Icon(
                   game.liked ? Icons.favorite : Icons.favorite_border,
                   color: game.liked ? Colors.red : null,
+                  size: 30,
                 ),
-                onPressed: () {
-                  toggleFavorite(game);
-                },
+                onPressed: () => onGameLiked(game),
               ),
             ],
           ),
@@ -277,96 +294,109 @@ class _MainScreenState extends State<MainScreen> {
 
 class FavoritesPage extends StatelessWidget {
   final List<GameItem> games;
+  final Function(GameItem) onGameLiked;
 
-  const FavoritesPage({super.key, required this.games});
+  const FavoritesPage(
+      {super.key, required this.games, required this.onGameLiked});
 
   @override
   Widget build(BuildContext context) {
-    final favoriteGames = games.where((game) => game.liked).toList()
-      ..sort((a, b) => a.title.compareTo(b.title));
+    final favoriteGames = games.where((game) => game.liked).toList();
 
-    return Scaffold(
-      appBar: AppBar(title: const Text("Favoris")),
-      body: favoriteGames.isEmpty
-          ? const Center(child: Text("Aucun jeu en favori"))
-          : ListView.builder(
-              itemCount: favoriteGames.length,
-              itemBuilder: (context, index) {
-                final game = favoriteGames[index];
-                return Card(
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => GameDetailPage(game: game),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      height: 120,
-                      padding: const EdgeInsets.all(8),
-                      child: Row(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: SizedBox(
-                              width: 100,
-                              height: double.infinity,
-                              child: Image.asset(
-                                game.image,
-                                fit: BoxFit.contain,
-                              ),
-                            ),
+    favoriteGames.sort((a, b) => a.title.compareTo(b.title));
+
+    return favoriteGames.isEmpty
+        ? const Center(child: Text("Aucun jeu favori pour l'instant"))
+        : ListView.builder(
+            itemCount: favoriteGames.length,
+            itemBuilder: (context, index) {
+              final game = favoriteGames[index];
+              return Card(
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => GameDetailPage(game: game),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    height: 100,
+                    padding: EdgeInsets.zero,
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          height: 100,
+                          width: 100,
+                          child: Image.asset(
+                            game.image,
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
                                   game.title,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(fontSize: 18),
                                 ),
-                                const SizedBox(height: 8),
                                 Text(
-                                  game.platform,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
+                                  game.shortDescription,
+                                  style: const TextStyle(fontSize: 14),
                                 ),
                               ],
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            game.liked ? Icons.favorite : Icons.favorite_border,
+                            color: game.liked ? Colors.red : null,
+                            size: 30,
+                          ),
+                          onPressed: () => onGameLiked(game),
+                        ),
+                      ],
                     ),
                   ),
-                );
-              },
-            ),
-    );
+                ),
+              );
+            },
+          );
   }
 }
 
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
+class AboutPage extends StatelessWidget {
+  const AboutPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Paramètres")),
-      body: const Center(
-        child: Text("Page des paramètres en construction..."),
-      ),
-    );
+    return const Center(child: Text("Développé par Guillaume FOISSY"));
   }
+}
+
+Map<String, List<GameItem>> getGamesByPlatform() {
+  Map<String, List<GameItem>> categorizedGames = {
+    "PlayStation": [],
+    "Xbox": [],
+    "Nintendo Switch": [],
+  };
+
+  for (var game in games) {
+    categorizedGames[game.platform]?.add(game);
+  }
+
+  for (var entry in categorizedGames.entries) {
+    entry.value.sort((a, b) => a.title.compareTo(b.title));
+  }
+
+  return categorizedGames;
 }
