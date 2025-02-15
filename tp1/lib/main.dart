@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'data.dart';
+import 'favorite.dart';
+import 'about.dart';
 import 'gamedetailpage.dart';
 
 void main() {
@@ -48,10 +50,10 @@ class _MainScreenState extends State<MainScreen> {
         offset = 0;
         break;
       case "Xbox":
-        offset = 1560;
+        offset = 2120;
         break;
       case "Nintendo Switch":
-        offset = 3235;
+        offset = 4395;
         break;
     }
     _scrollController.animateTo(
@@ -96,7 +98,8 @@ class _MainScreenState extends State<MainScreen> {
                 ElevatedButton(
                   onPressed: () => scrollToPlatform("PlayStation"),
                   style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(160, 60),
+                    maximumSize: const Size(160, 60),
+                    //minimumSize: const Size(160, 60),
                     backgroundColor: const Color(0xFF003791),
                     foregroundColor: Colors.white,
                     textStyle: const TextStyle(fontSize: 20),
@@ -107,7 +110,8 @@ class _MainScreenState extends State<MainScreen> {
                 ElevatedButton(
                   onPressed: () => scrollToPlatform("Xbox"),
                   style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(160, 60),
+                    maximumSize: const Size(160, 60),
+                    //minimumSize: const Size(160, 60),
                     backgroundColor: const Color(0xFF379137),
                     foregroundColor: Colors.white,
                     textStyle: const TextStyle(fontSize: 20),
@@ -118,7 +122,8 @@ class _MainScreenState extends State<MainScreen> {
                 ElevatedButton(
                   onPressed: () => scrollToPlatform("Nintendo Switch"),
                   style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(160, 60),
+                    maximumSize: const Size(160, 60),
+                    //minimumSize: const Size(160, 60),
                     backgroundColor: const Color(0xFFE60012),
                     foregroundColor: Colors.white,
                     textStyle: const TextStyle(fontSize: 20),
@@ -242,7 +247,7 @@ class HomePage extends StatelessWidget {
           );
         },
         child: Container(
-          height: 100,
+          height: 140,
           padding: EdgeInsets.zero,
           child: Row(
             children: [
@@ -253,7 +258,7 @@ class HomePage extends StatelessWidget {
                   game.image,
                   width: 100,
                   height: 100,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                 ),
               ),
               const SizedBox(width: 10),
@@ -289,97 +294,6 @@ class HomePage extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class FavoritesPage extends StatelessWidget {
-  final List<GameItem> games;
-  final Function(GameItem) onGameLiked;
-
-  const FavoritesPage(
-      {super.key, required this.games, required this.onGameLiked});
-
-  @override
-  Widget build(BuildContext context) {
-    final favoriteGames = games.where((game) => game.liked).toList();
-
-    favoriteGames.sort((a, b) => a.title.compareTo(b.title));
-
-    return favoriteGames.isEmpty
-        ? const Center(child: Text("Aucun jeu favori pour l'instant"))
-        : ListView.builder(
-            itemCount: favoriteGames.length,
-            itemBuilder: (context, index) {
-              final game = favoriteGames[index];
-              return Card(
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => GameDetailPage(game: game),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    height: 100,
-                    padding: EdgeInsets.zero,
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          height: 100,
-                          width: 100,
-                          child: Image.asset(
-                            game.image,
-                            width: 100,
-                            height: 100,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  game.title,
-                                  style: const TextStyle(fontSize: 18),
-                                ),
-                                Text(
-                                  game.shortDescription,
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            game.liked ? Icons.favorite : Icons.favorite_border,
-                            color: game.liked ? Colors.red : null,
-                            size: 30,
-                          ),
-                          onPressed: () => onGameLiked(game),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          );
-  }
-}
-
-class AboutPage extends StatelessWidget {
-  const AboutPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text("Développé par Guillaume FOISSY"));
   }
 }
 
