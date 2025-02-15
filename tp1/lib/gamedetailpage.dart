@@ -40,7 +40,10 @@ class GameDetailPage extends StatelessWidget {
                 children: [
                   Text(
                     "Plateforme: ${game.platform}",
-                    style: const TextStyle(fontSize: 20, color: Colors.black),
+                    style: const TextStyle(
+                        fontSize: 20,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(width: 8),
@@ -55,6 +58,13 @@ class GameDetailPage extends StatelessWidget {
               Text(
                 "Date de sortie: ${DateFormat('dd/MM/yyyy').format(game.date)}",
                 style: const TextStyle(fontSize: 20),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                "PEGI: ${game.pegi}",
+                style: TextStyle(
+                    fontSize: 20, color: colorPegiByCategory(game.pegi)),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
@@ -81,5 +91,14 @@ class GameDetailPage extends StatelessWidget {
       default:
         return "assets/images/default.png";
     }
+  }
+
+  Color colorPegiByCategory(int pegi) {
+    if (pegi <= 7) {
+      return Color(0xFFA5C400);
+    } else if (pegi > 7 && pegi <= 16) {
+      return Color(0xFFF5A200);
+    }
+    return Color(0xFFE2011A);
   }
 }
