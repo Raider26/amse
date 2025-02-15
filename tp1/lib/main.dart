@@ -80,6 +80,12 @@ class _MainScreenState extends State<MainScreen> {
       const AboutPage(),
     ];
 
+    final Map<int, Color> bottomBarColorItems = {
+      0: Colors.amber,
+      1: Colors.red,
+      2: Colors.lightBlue
+    };
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -99,7 +105,6 @@ class _MainScreenState extends State<MainScreen> {
                   onPressed: () => scrollToPlatform("PlayStation"),
                   style: ElevatedButton.styleFrom(
                     maximumSize: const Size(160, 60),
-                    //minimumSize: const Size(160, 60),
                     backgroundColor: const Color(0xFF003791),
                     foregroundColor: Colors.white,
                     textStyle: const TextStyle(fontSize: 20),
@@ -111,7 +116,6 @@ class _MainScreenState extends State<MainScreen> {
                   onPressed: () => scrollToPlatform("Xbox"),
                   style: ElevatedButton.styleFrom(
                     maximumSize: const Size(160, 60),
-                    //minimumSize: const Size(160, 60),
                     backgroundColor: const Color(0xFF379137),
                     foregroundColor: Colors.white,
                     textStyle: const TextStyle(fontSize: 20),
@@ -123,7 +127,6 @@ class _MainScreenState extends State<MainScreen> {
                   onPressed: () => scrollToPlatform("Nintendo Switch"),
                   style: ElevatedButton.styleFrom(
                     maximumSize: const Size(160, 60),
-                    //minimumSize: const Size(160, 60),
                     backgroundColor: const Color(0xFFE60012),
                     foregroundColor: Colors.white,
                     textStyle: const TextStyle(fontSize: 20),
@@ -149,12 +152,13 @@ class _MainScreenState extends State<MainScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
+        selectedItemColor: bottomBarColorItems[_selectedIndex],
         onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.gamepad), label: 'Jeux'),
           BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Favoris'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.info_outline), label: 'À propos'),
+              icon: Icon(Icons.info_outline), label: 'À propos')
         ],
       ),
     );

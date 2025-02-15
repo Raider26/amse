@@ -23,7 +23,7 @@ class GameDetailPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width * 0.8,
-                  height: 200,
+                  height: MediaQuery.of(context).size.height * 0.3,
                   child: Image.asset(game.image, fit: BoxFit.contain),
                 ),
               ),
@@ -31,7 +31,7 @@ class GameDetailPage extends StatelessWidget {
               Text(
                 game.title,
                 style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 10),
@@ -40,7 +40,7 @@ class GameDetailPage extends StatelessWidget {
                 children: [
                   Text(
                     "Plateforme: ${game.platform}",
-                    style: const TextStyle(fontSize: 18, color: Colors.black),
+                    style: const TextStyle(fontSize: 20, color: Colors.black),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(width: 8),
@@ -54,21 +54,14 @@ class GameDetailPage extends StatelessWidget {
               const SizedBox(height: 20),
               Text(
                 "Date de sortie: ${DateFormat('dd/MM/yyyy').format(game.date)}",
-                style: const TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 20),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
               Text(
                 game.shortDescription,
-                style: const TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 20),
                 textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text("Retour"),
               ),
             ],
           ),
