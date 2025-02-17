@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'data.dart';
 
 class GameDetailPage extends StatelessWidget {
@@ -56,10 +57,39 @@ class GameDetailPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Text(
+                "Type: ${game.type}",
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              Text(
                 "Date de sortie: ${DateFormat('dd/MM/yyyy').format(game.date)}",
                 style: const TextStyle(fontSize: 20),
                 textAlign: TextAlign.center,
               ),
+              const SizedBox(height: 20),
+              Text(
+                "Prix: ${game.price == -1 ? "Non Disponible" : "${game.price} €"}",
+                style: const TextStyle(fontSize: 20),
+                textAlign: TextAlign.center,
+              ),
+              game.link.isNotEmpty
+                  ? InkWell(
+                      onTap: () {
+                        _launchURL(game.link);
+                      },
+                      child: Text(
+                        "Lien du jeu",
+                        style: const TextStyle(
+                            fontSize: 20,
+                            color: Colors.blue,
+                            decoration: TextDecoration.underline,
+                            decorationColor: Colors.blue),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  : SizedBox.shrink(),
               const SizedBox(height: 20),
               Text(
                 "PEGI: ${game.pegi}",
@@ -78,6 +108,14 @@ class GameDetailPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   String _getPlatformIcon(String platform) {

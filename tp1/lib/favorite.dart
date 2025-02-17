@@ -33,7 +33,7 @@ class FavoritesPage extends StatelessWidget {
                     );
                   },
                   child: Container(
-                    height: 100,
+                    height: 140,
                     padding: EdgeInsets.zero,
                     child: Row(
                       children: [
