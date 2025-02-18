@@ -28,7 +28,7 @@ class GameDetailPage extends StatelessWidget {
                   child: Image.asset(game.image, fit: BoxFit.contain),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Text(
                 game.title,
                 style:
@@ -42,8 +42,8 @@ class GameDetailPage extends StatelessWidget {
                   Text(
                     "Plateforme: ${game.platform}",
                     style: const TextStyle(
-                        fontSize: 20,
-                        color: Colors.black,
+                        fontSize: 22,
+                        //color: Colors.black,
                         fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
@@ -55,20 +55,20 @@ class GameDetailPage extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Text(
                 "Type: ${game.type}",
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Text(
-                "Date de sortie: ${DateFormat('dd/MM/yyyy').format(game.date)}",
+                "Date de sortie: ${game.price == -1 ? game.date.year.toString() : DateFormat('dd/MM/yyyy').format(game.date)}",
                 style: const TextStyle(fontSize: 20),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Text(
                 "Prix: ${game.price == -1 ? "Non Disponible" : "${game.price} €"}",
                 style: const TextStyle(fontSize: 20),
@@ -90,14 +90,14 @@ class GameDetailPage extends StatelessWidget {
                       ),
                     )
                   : SizedBox.shrink(),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Text(
                 "PEGI: ${game.pegi}",
                 style: TextStyle(
                     fontSize: 20, color: colorPegiByCategory(game.pegi)),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Text(
                 game.shortDescription,
                 style: const TextStyle(fontSize: 20),

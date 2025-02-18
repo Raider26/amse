@@ -5,6 +5,10 @@ class AboutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text("Développé par Guillaume FOISSY"));
+    return const Center(
+        child: Text(
+      "Développé par Guillaume FOISSY",
+      style: TextStyle(fontSize: 25),
+    ));
   }
 }
