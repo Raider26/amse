@@ -91,82 +91,86 @@ class _MainScreenState extends State<MainScreen> {
         title: Text(
           ["Liste des Jeux", "Jeux Favoris", "À propos"][_selectedIndex],
         ),
+        backgroundColor: Color(0xFF778899),
         centerTitle: true,
         titleTextStyle:
             const TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
       ),
-      body: Column(
-        children: [
-          if (_selectedIndex == 0) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () => scrollToPlatform("PlayStation"),
-                  style: ElevatedButton.styleFrom(
-                    maximumSize: const Size(160, 60),
-                    elevation: 10,
-                    shadowColor: Colors.black,
-                    backgroundColor: const Color(0xFF003791),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(color: Colors.black38, width: 3),
+      body: Container(
+        color: Color(0xFF778899),
+        child: Column(
+          children: [
+            if (_selectedIndex == 0) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => scrollToPlatform("PlayStation"),
+                    style: ElevatedButton.styleFrom(
+                      maximumSize: const Size(160, 60),
+                      elevation: 10,
+                      shadowColor: Colors.black,
+                      backgroundColor: const Color(0xFF003791),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        side: BorderSide(color: Colors.black38, width: 3),
+                      ),
+                      textStyle: const TextStyle(fontSize: 20),
                     ),
-                    textStyle: const TextStyle(fontSize: 20),
+                    child: const Text("PlayStation"),
                   ),
-                  child: const Text("PlayStation"),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () => scrollToPlatform("Xbox"),
-                  style: ElevatedButton.styleFrom(
-                    maximumSize: const Size(160, 60),
-                    backgroundColor: const Color(0xFF379137),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(color: Colors.black38, width: 3),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () => scrollToPlatform("Xbox"),
+                    style: ElevatedButton.styleFrom(
+                      maximumSize: const Size(160, 60),
+                      backgroundColor: const Color(0xFF379137),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        side: BorderSide(color: Colors.black38, width: 3),
+                      ),
+                      elevation: 10,
+                      shadowColor: Colors.black,
+                      textStyle: const TextStyle(fontSize: 20),
                     ),
-                    elevation: 10,
-                    shadowColor: Colors.black,
-                    textStyle: const TextStyle(fontSize: 20),
+                    child: const Text("Xbox"),
                   ),
-                  child: const Text("Xbox"),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () => scrollToPlatform("Nintendo Switch"),
-                  style: ElevatedButton.styleFrom(
-                    maximumSize: const Size(160, 60),
-                    backgroundColor: const Color(0xFFE60012),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(color: Colors.black38, width: 3),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () => scrollToPlatform("Nintendo Switch"),
+                    style: ElevatedButton.styleFrom(
+                      maximumSize: const Size(160, 60),
+                      backgroundColor: const Color(0xFFE60012),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        side: BorderSide(color: Colors.black38, width: 3),
+                      ),
+                      elevation: 10,
+                      shadowColor: Colors.black,
+                      textStyle: const TextStyle(fontSize: 20),
                     ),
-                    elevation: 10,
-                    shadowColor: Colors.black,
-                    textStyle: const TextStyle(fontSize: 20),
+                    child: const Text("Switch"),
                   ),
-                  child: const Text("Switch"),
-                ),
-              ],
+                ],
+              ),
+              const SizedBox(height: 20),
+            ],
+            Expanded(
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    _selectedIndex = index;
+                  });
+                },
+                children: _pages,
+              ),
             ),
-            const SizedBox(height: 20),
           ],
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _selectedIndex = index;
-                });
-              },
-              children: _pages,
-            ),
-          ),
-        ],
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,

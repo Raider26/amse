@@ -40,12 +40,15 @@ class GameDetailPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Plateforme: ${game.platform}",
-                    style: const TextStyle(
+                    "Plateforme: ",
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    game.platform,
+                    style: TextStyle(
                         fontSize: 22,
-                        //color: Colors.black,
-                        fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
+                        fontWeight: FontWeight.bold,
+                        color: colorByPlatform(game.platform)),
                   ),
                   const SizedBox(width: 8),
                   Image.asset(
@@ -138,5 +141,14 @@ class GameDetailPage extends StatelessWidget {
       return Color(0xFFF5A200);
     }
     return Color(0xFFE2011A);
+  }
+
+  Color colorByPlatform(String platform) {
+    if (platform == "PlayStation") {
+      return Color(0xFF003791);
+    } else if (platform == "Xbox") {
+      return Color(0xFF379137);
+    }
+    return Color(0xFFE60012);
   }
 }

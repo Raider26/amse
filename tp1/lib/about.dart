@@ -8,7 +8,7 @@ class AboutPage extends StatelessWidget {
     return const Center(
         child: Text(
       "Développé par Guillaume FOISSY",
-      style: TextStyle(fontSize: 25),
+      style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
     ));
   }
 }
